@@ -1,7 +1,8 @@
 let player;
+let enemies = [];
 let gravity = new p5.Vector(0, 0.3);
 let platforms = [];
-let testGround;
+//let testGround;
 
 function setup()
 {
@@ -11,9 +12,11 @@ function setup()
 	platforms.push(new Platform(windowWidth/2 - 20, windowHeight/2 + 60, 100, 20, .85));
 	
 	for (let i = 0; i < 4; i++)
-		platforms.push(new Platform(random(windowWidth/2 - 400, windowWidth/2 + 400), random(windowHeight/2 - 200, windowHeight/2 + 200), random(50, 200), random(20, 40), .85));
+		platforms.push(new Platform(random(windowWidth/2 - 400, windowWidth/2 + 400), random(windowHeight/2 - 200, windowHeight/2 + 200), random(50, 200), random(20, 40), .95));
 	
 	player = new Player(windowWidth/2, windowHeight/2);
+	
+	enemies.push(new Enemy(30, 30));
 	
 	noCursor();
 }
@@ -21,13 +24,26 @@ function setup()
 function draw()
 {
 	background(0);
-	testGround = false;
+	//testGround = false;
 	
-	for (let i = 0; i < platforms.length; i++)
+	for (let platform of platforms)
 	{
-		platforms[i].show();
-		if(!testGround && player.checkCollusion(platforms[i]))
-			testGround = !testGround;
+		platform.show();
+		/*if(!testGround && */player.checkCollusion(platform)//)
+			//testGround = !testGround;
+		
+		for (let enemy of enemies)
+			enemy.checkCollusion(platform);
+	}
+	
+	for (let enemy of enemies)
+	{
+		if (!enemy.isOnGround)
+			enemy.applyForce(gravity);
+		
+		enemy.checkEdges();
+		enemy.update();
+		enemy.show();
 	}
 	
 	if (!player.isOnGround)
@@ -85,130 +101,6 @@ function windowResized()
 	createCanvas(windowWidth, windowHeight);
 }
 
-class Player
-{
-	constructor(x,y)
-	{
-		// Movement Vectors
-		this.pos = new p5.Vector(x,y);
-		this.vel = new p5.Vector(0,0);
-		this.acc = new p5.Vector(0,0);
-
-		this.height = 40;
-		this.width = 20;
-
-		// Keys being pressed
-		this.right = false;
-		this.left = false;
-
-		this.isOnGround = false;
-		this.dJump = false;
-	}
-
-	show()
-	{
-		fill(255);
-		//stroke(this.r,this.b,this.g);
-		rect(this.pos.x, this.pos.y, this.width, this.height);
-	}
-
-	applyForce(force)
-	{
-		this.acc.add(force);
-	}
-
-	update()
-	{
-		if (this.right)
-		{
-			this.applyForce(.1);
-		}
-
-		else if (this.left)
-		{
-			this.applyForce(-.1);
-		}
-
-		this.vel.add(this.acc);
-		this.pos.add(this.vel);
-		this.acc.mult(0);
-
-		this.vel.limit(10);
-	}
-
-	toggleOn(keyCode)
-	{
-		if (keyCode == 39)
-		{
-			this.right = true;
-		}
-
-		else
-		{
-			this.left = true;
-		}
-	}
-
-	toggleOff(keyCode)
-	{
-		if (keyCode == 39)
-		{
-			this.right = false;
-		}
-
-		else
-		{
-			this.left = false;
-		}
-	}
-
-	checkCollusion(platform)
-	{
-		// If the player hits the platform
-		if ((this.pos.x <= platform.pos.x + platform.width && this.pos.x + this.width >= platform.pos.x) && (this.pos.y <= platform.pos.y + platform.height && this.pos.y + this.height >= platform.pos.y))
-		{
-			//Left or Right
-			if ((this.pos.x + this.width < platform.pos.x + 10 || this.pos.x > platform.pos.x + platform.width - 10) && !(this.pos.y + this.height < platform.pos.y + 10))
-			{
-				this.left = false;
-				this.right = false;
-				this.vel.set(0, this.vel.y);
-				this.isOnGround = false;
-			}
-			
-			//Bottom
-			else if (this.pos.y > platform.pos.y + platform.height - 10)
-			{
-				this.vel.set(this.vel.x, -this.vel.y);
-				this.isOnGround = false;
-			}
-			
-			//Top
-			else if (this.pos.y + this.height < platform.pos.y + 10)
-			{
-					this.pos.set(this.pos.x, platform.pos.y - this.height);
-					this.vel.set(this.vel.x, 0);
-					this.vel.mult(platform.friction);
-					this.isOnGround = true;
-					this.dJump = false;
-			}
-			
-			return true;
-		}
-		
-		else 
-		{
-			this.isOnGround = false;
-			return false;
-		}
-	}
-	
-	checkEdges()
-	{
-		if (this.pos.y > windowHeight)
-			resetMap();
-	}
-}
 
 class Platform
 {
@@ -232,10 +124,14 @@ class Platform
 function resetMap()
 {
 	platforms.splice(0, platforms.length);
-	player.pos.set(windowWidth/2, windowHeight/2);
 	
 	platforms.push(new Platform(windowWidth/2 - 20, windowHeight/2 + 60, 100, 20, .85));
 	
 	for (let i = 1; i < 8; i++)
 		platforms.push(new Platform(i * random(100, 300), i * random(50, 200), 100, 20, .85));
+}
+
+function resetEntity(entity, x, y)
+{
+	entity.pos.set(x,y);
 }
