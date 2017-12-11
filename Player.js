@@ -16,6 +16,8 @@ class Player
 
 		this.isOnGround = false;
 		this.dJump = false;
+		
+		this.lastPlatform;
 	}
 
 	show()
@@ -104,6 +106,7 @@ class Player
 					this.vel.mult(platform.friction);
 					this.isOnGround = true;
 					this.dJump = false;
+					this.lastPlatform = platform;
 			}
 			
 			return true;
@@ -119,9 +122,9 @@ class Player
 	checkEdges()
 	{
 		// Selects a random platform
-		let platform = platforms[random(0,platforms.length - 1)];
+		let platform = platforms[Math.floor(random(0,platforms.length))];
 		
 		if (this.pos.y > windowHeight)
-			resetEntity(this, platform.pos.x + platform.width/2, platform.pos.y + platform.height + 20);
+			resetEntity(this, platform.pos.x + platform.width/2, platform.pos.y - platform.height - 20);
 	}
 }

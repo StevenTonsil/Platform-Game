@@ -16,7 +16,8 @@ function setup()
 	
 	player = new Player(windowWidth/2, windowHeight/2);
 	
-	enemies.push(new Enemy(30, 30));
+	for (let i = 0; i < 1; i++)
+		enemies.push(new Enemy(30, 30));
 	
 	noCursor();
 }
@@ -133,5 +134,6 @@ function resetMap()
 
 function resetEntity(entity, x, y)
 {
+	entity.vel.set(0,0);
 	entity.pos.set(x,y);
 }
