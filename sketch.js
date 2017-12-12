@@ -26,14 +26,14 @@ function setup()
 function draw()
 {
 	background(0);
+	translate(-player.pos.x + windowWidth/2, -player.pos.y + windowHeight/2);
 	//testGround = false;
 	
 	for (let platform of platforms)
 	{
 		platform.show();
-		/*if(!testGround && */player.checkCollusion(platform)//)
-			//testGround = !testGround;
-		
+		player.checkCollusion(platform);
+			
 		for (let enemy of enemies)
 			enemy.checkCollusion(platform);
 	}
@@ -46,6 +46,8 @@ function draw()
 		enemy.checkEdges();
 		enemy.update();
 		enemy.show();
+		
+		enemy.checkCollusion(player);
 	}
 	
 	if (!player.isOnGround)
@@ -174,9 +176,12 @@ class Platform
 
 	show()
 	{
+		push();
+		strokeWeight(2);
 		stroke(255);
 		fill(0);
 		rect(this.pos.x, this.pos.y, this.width, this.height);
+		pop();
 	}
 
 }

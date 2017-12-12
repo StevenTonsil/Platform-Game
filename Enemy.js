@@ -7,9 +7,11 @@ class Enemy extends Player
 	
 	show()
 	{
+		push();
 		fill(255, 0, 0);
 		noStroke();
 		rect(this.pos.x, this.pos.y, this.width, this.height);
+		pop();
 	}
 	
 	update()

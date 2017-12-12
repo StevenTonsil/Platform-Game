@@ -22,9 +22,11 @@ class Player
 
 	show()
 	{
+		push();
 		fill(255);
 		noStroke();
 		rect(this.pos.x, this.pos.y, this.width, this.height);
+		pop();
 	}
 
 	applyForce(force)
@@ -77,36 +79,45 @@ class Player
 		}
 	}
 
-	checkCollusion(platform)
+	checkCollusion(object)
 	{
-		// If the player hits the platform
-		if ((this.pos.x <= platform.pos.x + platform.width && this.pos.x + this.width >= platform.pos.x) && (this.pos.y <= platform.pos.y + platform.height && this.pos.y + this.height >= platform.pos.y))
+		// If the player hits the object
+		if ((this.pos.x <= object.pos.x + object.width && this.pos.x + this.width >= object.pos.x) && (this.pos.y <= object.pos.y + object.height && this.pos.y + this.height >= object.pos.y))
 		{
-			//Left or Right
-			if ((this.pos.x + this.width < platform.pos.x + 10 || this.pos.x > platform.pos.x + platform.width - 10) && !(this.pos.y + this.height < platform.pos.y + 10))
+			if (object instanceof Platform)
 			{
-				this.left = false;
-				this.right = false;
-				this.vel.set(0, this.vel.y);
-				this.isOnGround = false;
+				//Left or Right
+				if ((this.pos.x + this.width < object.pos.x + 10 || this.pos.x > object.pos.x + object.width - 10) && !(this.pos.y + this.height < object.pos.y + 10))
+				{
+					this.left = false;
+					this.right = false;
+					this.vel.set(0, this.vel.y);
+					this.isOnGround = false;
+				}
+				
+				//Bottom
+				else if (this.pos.y > object.pos.y + object.height - 10)
+				{
+					this.vel.set(this.vel.x, -this.vel.y);
+					this.isOnGround = false;
+				}
+				
+				//Top
+				else if (this.pos.y + this.height < object.pos.y + 10)
+				{
+						this.pos.set(this.pos.x, object.pos.y - this.height);
+						this.vel.set(this.vel.x, 0);
+						this.vel.mult(object.friction);
+						this.isOnGround = true;
+						this.dJump = false;
+						this.lastPlatform = object;
+				}
 			}
 			
-			//Bottom
-			else if (this.pos.y > platform.pos.y + platform.height - 10)
+			else if (object instanceof Player)
 			{
-				this.vel.set(this.vel.x, -this.vel.y);
-				this.isOnGround = false;
-			}
-			
-			//Top
-			else if (this.pos.y + this.height < platform.pos.y + 10)
-			{
-					this.pos.set(this.pos.x, platform.pos.y - this.height);
-					this.vel.set(this.vel.x, 0);
-					this.vel.mult(platform.friction);
-					this.isOnGround = true;
-					this.dJump = false;
-					this.lastPlatform = platform;
+				let platform = platforms[Math.floor(random(0,platforms.length))];
+				resetEntity(object, platform.pos.x + platform.width/2, platform.pos.y - platform.height - 20);
 			}
 			
 			return true;
@@ -114,7 +125,8 @@ class Player
 		
 		else 
 		{
-			this.isOnGround = false;
+			if (object instanceof Platform)
+				this.isOnGround = false;
 			return false;
 		}
 	}
