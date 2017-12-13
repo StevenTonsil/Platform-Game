@@ -114,7 +114,7 @@ class Player
 				}
 			}
 			
-			else if (object instanceof Player)
+			else if (object instanceof Player || Enemy)
 			{
 				let platform = platforms[Math.floor(random(0,platforms.length))];
 				resetEntity(object, platform.pos.x + platform.width/2, platform.pos.y - platform.height - 20);
