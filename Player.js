@@ -136,7 +136,8 @@ class Player
 		// Selects a random platform
 		let platform = platforms[Math.floor(random(0,platforms.length))];
 		
-		if (this.pos.y > windowHeight)
+		// Enemies die if they leave the bottom of the screen, relative to the player
+		if (this.pos.y > windowHeight + player.pos.y)
 			resetEntity(this, platform.pos.x + platform.width/2, platform.pos.y - platform.height - 20);
 	}
 }

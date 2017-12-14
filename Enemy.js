@@ -4,7 +4,7 @@ class Enemy extends Player
 	{
 		super(x,y);
 		
-		this.target = enemies[0];
+		this.target = player;
 		this.AI = 2;
 	}
 	

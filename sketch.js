@@ -19,7 +19,7 @@ function setup()
 	for (let i = 0; i < 2; i++)
 		enemies.push(new Enemy(30, 30));
 	
-	enemies[1].target = player;
+	//enemies[1].target = player;
 	
 	noCursor();
 }
@@ -50,13 +50,13 @@ function draw()
 		enemy.checkCollusion(player);
 		
 		for (let enemy2 of enemies)
-			enemy.checkCollusion(enemy2);
+			if (JSON.stringify(enemy) !== JSON.stringify(enemy2))
+				enemy.checkCollusion(enemy2);
 	}
 	
 	if (!player.isOnGround)
 		player.applyForce(gravity);
 	
-	player.checkEdges();
 	player.update();
 	player.show();
 	
